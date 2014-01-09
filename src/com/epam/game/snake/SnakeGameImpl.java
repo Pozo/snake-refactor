@@ -14,34 +14,25 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import com.epam.game.EntityController;
 import com.epam.game.EntityDirection;
 import com.epam.game.GameSpeed;
 import com.epam.game.snake.toplist.Player;
-import com.epam.game.snake.toplist.TopListSerializer;
-import com.epam.game.snake.toplist.Toplist;
+import com.epam.game.snake.ui.GameBoard;
 import com.epam.game.snake.ui.GameKeyListener;
+import com.epam.game.snake.ui.ScorePanel;
 import com.epam.game.snake.ui.SnakeGameMenuBar;
-import com.epam.game.snake.ui.ToplistTable;
+import com.epam.game.snake.ui.TopListPane;
+import com.epam.game.snake.ui.TopPanel;
 
-public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, EntityController {
-
-    private static final long serialVersionUID = 1L;
+public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame {
     private int FRAME_WIDTH = 506;
     private int FRAME_HEIGHT = 380;
     
-    // board
     private static final int BLOCK_UNIT_SIZE = 10;
-    private int boardWidth = 50 * BLOCK_UNIT_SIZE;
-    private int boardHeight = 30 * BLOCK_UNIT_SIZE;
 
-    //private int xvalt = +BLOCK_UNIT_SIZE;
-    //private int yvalt;
-    
     private Point direction = new Point(+BLOCK_UNIT_SIZE, 0);
     
     // game
@@ -51,35 +42,34 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
     
     private Point[] positions = new Point[125];
     
-    //private Point[] p = new Point[125];
     private Random random = new Random();
 
     private JButton[] snakeBricks = new JButton[125];
     
-    private JPanel[] border = new JPanel[4];
-    private JPanel playground  = buildGameBoard();
+    private EntityController snakeController = new SnakeController(this);
+    private GameBoard playground  = new GameBoard();//buildGameBoard();
+    private ScorePanel scorePanel = new ScorePanel();
     
-    private JPanel top = new JPanel();
+    private TopPanel topPanel = new TopPanel();
     
-    private JLabel actualScore;
-    private JScrollPane scrollpane;
+    //private JLabel actualScore;
+    //private JScrollPane scrollpane;
+    private TopListPane topListPane = new TopListPane();
     
     private Snake snake = new Snake();
 
-    private Toplist topList = new Toplist();
-    private TopListSerializer listSerializer = new TopListSerializer();
+    //private Toplist topList = new Toplist();
+    
     
     {
-        top.setBounds(0, 0, boardWidth, boardHeight);
-        top.setBackground(Color.LIGHT_GRAY);
-        
         Arrays.fill(positions, new Point());
         //Collections.fill(topList, new Toplist("", 0));
 
         positions[0] = new Point(24 * BLOCK_UNIT_SIZE,14 * BLOCK_UNIT_SIZE);
 
         //listSerializer.write(topList.getPlayers());
-        topList.setPlayers(listSerializer.read());
+        //topList.setPlayers(listSerializer.read());
+        //topListPane.setTopList(topList);
     }
 
     /*
@@ -89,19 +79,13 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         (new Thread(this)).start();
     }
 
-    /*
-     * A Snake() függvény. Ez a program lelke. Itt történik az ablak
-     * létrehozása, az ablak minden elemények hozzáadása, az értékek
-     * inicializálása, az elsõ snake létrehozása, valamint itt híodik meg a
-     * "mozgató" függvény is
-     */
     public SnakeGameImpl() {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setJMenuBar(new SnakeGameMenuBar(this));
         
         add(playground, BorderLayout.CENTER);
-        add(buildScorePanel(), BorderLayout.SOUTH);
+        add(scorePanel, BorderLayout.SOUTH);
         setLayout(null);
 
         setResizable(false);
@@ -111,77 +95,21 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         
         createSnake();
     }
-
-    private JPanel buildScorePanel() {
-        JPanel scorePanel = new JPanel();
-        
-        actualScore = new JLabel();
-        actualScore.setForeground(Color.BLACK);
-        refreshActualScore();
-        scorePanel.add(actualScore);
-        
-        scorePanel.setBounds(0, boardHeight, boardWidth, 30);
-        scorePanel.setBackground(Color.GRAY);
-        return scorePanel;
-    }
-    private void refreshActualScore() {
-        actualScore.setText("Pontszám: " + scores);
-    }
-    private JPanel buildGameBoard() {
-        JPanel playground  = new JPanel();
-        playground.setLayout(null);
-        playground.setBounds(0, 0, boardWidth, boardHeight);
-        playground.setBackground(Color.LIGHT_GRAY);
-        
-        border[0] = new JPanel();
-        border[0].setBounds(0, 0, boardWidth, BLOCK_UNIT_SIZE);
-        border[1] = new JPanel();
-        border[1].setBounds(0, 0, BLOCK_UNIT_SIZE, boardHeight);
-        border[2] = new JPanel();
-        border[2].setBounds(0, boardHeight - BLOCK_UNIT_SIZE, boardWidth, BLOCK_UNIT_SIZE);
-        border[3] = new JPanel();
-        border[3].setBounds(boardWidth - BLOCK_UNIT_SIZE, 0, BLOCK_UNIT_SIZE, boardHeight);
-        playground.add(border[0]);
-        playground.add(border[1]);
-        playground.add(border[2]);
-        playground.add(border[3]);
-        return playground;
-    }
-
-    /*
-     * Az újraindító függvény. Ennek meghívásakor az érték újra alapállapotba
-     * kerülnek, ami eddig az ablakon volt az eltûnik, a mozgatás megáll, a
-     * keret, az elsõ snake és a pontszám újra kirajzoldik, és meghívódik a
-     * mozgató függvény
-     */
     @Override
     public void reset() {
         positions[0] = new Point(24 * BLOCK_UNIT_SIZE,14 * BLOCK_UNIT_SIZE);
-        // A pálya lepucolása
-        playground.removeAll();
+        playground.clear();
 
-        // Ha az elõzõ játékban meghalt a kígyó, akkor a játék vége kijelzõ
-        // törlése az ablakból
         if (!isRunning()) {
-            scrollpane.removeAll();
-            remove(top);
+            topListPane.removeAll();
+            remove(topPanel);
         }
-
-        // A keret hozzáadása a pályához
-        playground.add(border[0]);
-        playground.add(border[1]);
-        playground.add(border[2]);
-        playground.add(border[3]);
-
-        // Az elsõ kígyó létrehozása, kirajzolása
         createSnake();
 
-        // A pálya hozzáadása az ablakhoz, annak újrarajzolása és a pontszám
-        // kiírása
         add(playground, BorderLayout.CENTER);
         repaint();
         setVisible(true);
-        refreshActualScore();
+        scorePanel.refreshActualScore(scores);
         // A mozgatás elindítása
         start();
     }
@@ -228,31 +156,25 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         positions[size].setLocation(kajax,kajay);
         snakeBricks[size].setBounds(kajax, kajay, BLOCK_UNIT_SIZE, BLOCK_UNIT_SIZE);
     }
-
-    /*
-     * Ez a függvény a játék végét vizsgálja. Megnézi, hogy a kígyó halála után
-     * felkerül-e a toplistára a játékos az elért eredményével. Ha igen akkor
-     * bekéri a nevét, és frissíti a toplistát. Ha nem akkor egy játék vége
-     * képernyõt rajzol ki. A végén pedig szerializál.
-     */
     private void toplistabatesz() {
         ArrayList<JComponent> labels = new ArrayList<>();
 
         // Ha az elért eredmény jobb az eddigi legkisebb eredménynél
-        if (getScore() > topList.getHighestScore()) {
+        if (getScore() > topListPane.getHighestScore()) {
            
             final JTextField playername = new JTextField(10);            
             playername.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    topList.addPlayer(new Player(playername.getText(), scores));
+                    topListPane.addPlayer(new Player(playername.getText(), scores));
 
                     //A toplista frissítése, és kirajzolása az ablakra
-                    scrollpane = new JScrollPane(new ToplistTable(topList.getPlayers()));
-               
-                    ArrayList<JComponent> labels = new ArrayList<>();
-                    labels.add(scrollpane);
-                    refillTop(labels);
+                    //scrollpane = new JScrollPane(new ToplistTable(topList.getPlayers()));
+                    topListPane.refresh();
+                    topPanel.refill(topListPane);
+                    add(topPanel, BorderLayout.CENTER);
+                    repaint();
+                    //refillTop(labels);
                 }
             });
             labels.add(new JLabel("A játéknak vége!"));
@@ -261,26 +183,16 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         } else {
             labels.add(new JLabel("A játéknak vége!"));
             labels.add(new JLabel("Sajnos nem került be az eredményed a legjobb 10-be. Próbálkozz újra (F2)."));
-            scrollpane = new JScrollPane(new ToplistTable(topList.getPlayers()));
+            topListPane.refresh();
+            //scrollpane = new JScrollPane(new ToplistTable(topList.getPlayers()));
         }
-        refillTop(labels);
-        // Szerializálás
-        listSerializer.write(topList.getPlayers());
-    }
-    private void refillTop(ArrayList<JComponent> labels) {
-        top.removeAll();
-        for (JComponent jComponent : labels) {
-            top.add(jComponent);
-        }
-        add(top, BorderLayout.CENTER);
-        setVisible(true);
+        topPanel.refill(labels);
+        add(topPanel, BorderLayout.CENTER);
         repaint();
+        //refillTop(labels);
+        // Szerializálás
+        topListPane.persist();
     }
-    /*
-     * A mozgató függvény megváltoztatja a kígyó pozícióját a megadott irányba,
-     * és közben vizsgálja, hogy a kígyó nem ütközött-e falnak vagy magának,
-     * illetve azt, hogy evett-e
-     */
     void move() {
         int size = snake.getSize();
         Point[] temp = new Point[size];
@@ -311,7 +223,7 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
                 putNewFood();
                 snake.incrementSize();
                 incrementScore();
-                refreshActualScore();
+                scorePanel.refreshActualScore(scores);
             } else {
                 snakeBricks[size - 1].setBounds((int)positions[size-1].getX(), (int)positions[size-1].getY(), BLOCK_UNIT_SIZE, BLOCK_UNIT_SIZE);
             }            
@@ -328,7 +240,7 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         return hitRightWall() || hitLeftWall() || hitBottomWall() || hitTopWall();
     }
     private boolean hitRightWall() {
-        return (positions[0].getX() + 10 == boardWidth);
+        return (positions[0].getX() + 10 == GameBoard.BOARD_WIDTH);
     }
     private boolean hitLeftWall() {
         return positions[0].getX() == 0;
@@ -337,7 +249,7 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         return positions[0].getY() == 0;
     }
     private boolean hitTopWall() {
-        return positions[0].getY() + 10 == boardHeight;
+        return positions[0].getY() + 10 == GameBoard.BOARD_HEIGHT;
     }
     /*
      * A run metódus hivja meg megadott idõközönként a mozgató függvényt
@@ -355,24 +267,23 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         }
     }
     @Override
-    public void moveLeft() {
-        snake.setCurrentDirection(EntityDirection.LEFT);
-        direction.setLocation(-BLOCK_UNIT_SIZE, 0);
-    }
-    @Override
-    public void moveRight() {
-        snake.setCurrentDirection(EntityDirection.RIGHT);
-        direction.setLocation(+BLOCK_UNIT_SIZE, 0);
-    }
-    @Override
-    public void moveUp() {
-        snake.setCurrentDirection(EntityDirection.UP);
-        direction.setLocation(0, -BLOCK_UNIT_SIZE);
-    }
-    @Override
-    public void moveDown() {
-        snake.setCurrentDirection(EntityDirection.DOWN);
-        direction.setLocation(0, +BLOCK_UNIT_SIZE);
+    public void setSnakeDirection(EntityDirection newDirection) {
+        switch (newDirection) {
+        case UP:
+            direction.setLocation(0, -BLOCK_UNIT_SIZE);
+            break;
+        case DOWN:
+            direction.setLocation(0, +BLOCK_UNIT_SIZE);
+            break;
+        case LEFT:
+            direction.setLocation(-BLOCK_UNIT_SIZE, 0);
+            break;
+        case RIGHT:
+        default:
+            direction.setLocation(+BLOCK_UNIT_SIZE, 0);
+            break;
+        }
+        snake.setCurrentDirection(newDirection);
     }
     @Override
     public void exit() {
@@ -381,21 +292,21 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
 
     @Override
     public void showToplist() {
-        JOptionPane.showMessageDialog(playground, scrollpane);        
+        JOptionPane.showMessageDialog(playground, topListPane);        
     }
 
     @Override
     public void setGameSpeed(GameSpeed speed) {
         switch (speed) {
         case SLOW:
-            SnakeGameSpeed.SLOW.getSpeed();
+            this.speed = SnakeGameSpeed.SLOW.getSpeed();
             break;
         case FAST:
-            SnakeGameSpeed.FAST.getSpeed();
+            this.speed = SnakeGameSpeed.FAST.getSpeed();
             break;
         case NORMAL:
         default:
-            SnakeGameSpeed.NORMAL.getSpeed();
+            this.speed = SnakeGameSpeed.NORMAL.getSpeed();
             break;
         }
     }
@@ -419,7 +330,7 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
 
     @Override
     public EntityController getEntityController() {
-        return this;
+        return snakeController;
     }
 
     @Override
@@ -432,7 +343,7 @@ public class SnakeGameImpl extends JFrame implements Runnable, SnakeGame, Entity
         gameRunning = false;
     }
 
-    @Override
+
     public boolean hasConflict(Point[] temp) {
         boolean hit = false;
         
