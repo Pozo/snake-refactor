@@ -1,7 +1,7 @@
 package com.epam.game.snake;
 
-import com.epam.game.EntityController;
-import com.epam.game.EntityDirection;
+import com.epam.game.entity.EntityController;
+import com.epam.game.entity.EntityDirection;
 
 public class SnakeController implements EntityController {
 
@@ -13,18 +13,18 @@ public class SnakeController implements EntityController {
 
     @Override
     public void moveLeft() {
-        game.setSnakeDirection(EntityDirection.LEFT);
+        game.getGameController().getGameEntityDirectionController().setEntityDirection(EntityDirection.LEFT);
     }
     @Override
     public void moveRight() {
-        game.setSnakeDirection(EntityDirection.RIGHT);
+        game.getGameController().getGameEntityDirectionController().setEntityDirection(EntityDirection.RIGHT);
     }
     @Override
     public void moveUp() {
-        game.setSnakeDirection(EntityDirection.UP);
+        game.getGameController().getGameEntityDirectionController().setEntityDirection(EntityDirection.UP);
     }
     @Override
     public void moveDown() {
-        game.setSnakeDirection(EntityDirection.DOWN);
+        game.getGameController().getGameEntityDirectionController().setEntityDirection(EntityDirection.DOWN);
     }
 }

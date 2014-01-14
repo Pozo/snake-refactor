@@ -1,4 +1,4 @@
-package com.epam.game;
+package com.epam.game.entity;
 
 import java.awt.Point;
 

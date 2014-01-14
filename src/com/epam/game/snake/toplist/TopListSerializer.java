@@ -3,6 +3,7 @@ package com.epam.game.snake.toplist;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -46,6 +47,10 @@ public class TopListSerializer {
     public void write(List<Player> topList) {
         // A fájl megnyitása
         try {
+            File file2 = new File(FILE_NAME);
+            if(!file2.exists()) {
+                file2.createNewFile();
+            }
             OutputStream file = new FileOutputStream(FILE_NAME);
 
             OutputStream buffer = new BufferedOutputStream(file);

@@ -7,10 +7,8 @@ import java.util.Collections;
 public class Toplist implements Serializable {
     private PlayerComparator playerComparator = new PlayerComparator();
     private static final long serialVersionUID = 1L;
-    
-    private static final int INITIAL_SIZE = 10;
 
-    private ArrayList<Player> players = new ArrayList<>(INITIAL_SIZE);
+    private ArrayList<Player> players = new ArrayList<>();
 
     public void setPlayers(ArrayList<Player> players) {
         this.players = players;

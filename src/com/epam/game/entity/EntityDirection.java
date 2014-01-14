@@ -1,4 +1,4 @@
-package com.epam.game;
+package com.epam.game.entity;
 
 public enum EntityDirection {
     UP(0x1),

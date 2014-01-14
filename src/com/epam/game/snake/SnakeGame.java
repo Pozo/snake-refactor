@@ -1,13 +1,15 @@
 package com.epam.game.snake;
 
-import com.epam.game.EntityDirection;
-import com.epam.game.Game;
+import java.awt.Point;
 
-public interface SnakeGame extends Game {
-    void putNewFood();
-    void setSnakeDirection(EntityDirection direction);
+import com.epam.game.Game;
+import com.epam.game.GameController;
+
+public interface SnakeGame extends Game,SnakeGameFrame {
+    void clearPlayground();
+    void refreshActualScore();
+    void addToToplist();
     
-    void showToplist();
-    void showAbout();
-    void showHelp();
+    Point getSnakeDirection();
+    GameController getGameController();
 }

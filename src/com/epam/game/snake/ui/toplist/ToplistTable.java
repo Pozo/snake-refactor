@@ -1,4 +1,4 @@
-package com.epam.game.snake.ui;
+package com.epam.game.snake.ui.toplist;
 
 import java.util.ArrayList;
 import java.util.Vector;

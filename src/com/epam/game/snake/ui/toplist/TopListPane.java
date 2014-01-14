@@ -1,4 +1,4 @@
-package com.epam.game.snake.ui;
+package com.epam.game.snake.ui.toplist;
 
 import javax.swing.JScrollPane;
 
@@ -12,8 +12,8 @@ public class TopListPane extends JScrollPane {
     private Toplist topList = new Toplist();
 
     public TopListPane() {
-
         topList.setPlayers(listSerializer.read());
+        refresh();
     }
 
     public int getHighestScore() {

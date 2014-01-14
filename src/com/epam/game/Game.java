@@ -1,18 +1,14 @@
 package com.epam.game;
 
-
+import com.epam.game.entity.EntityController;
+import com.epam.game.entity.EntityDirectionObserver;
+import com.epam.game.snake.ui.GameBoard;
 
 public interface Game {
-    void stop();
     void reset();    
     void exit();
-    boolean isRunning();
     
-    int getScore();
-    void incrementScore();
-
-    void setGameSpeed(GameSpeed speed);
-    
-    Entity getEntity();
+    EntityDirectionObserver getEntityDirectionController();
     EntityController getEntityController();
+    GameBoard getPlayground();
 }

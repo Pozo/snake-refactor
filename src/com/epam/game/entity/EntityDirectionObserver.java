@@ -1,6 +1,6 @@
-package com.epam.game;
+package com.epam.game.entity;
 
-public interface Entity {
+public interface EntityDirectionObserver {
     public boolean canMoveLeft();
     public boolean canMoveRight();
     public boolean canMoveUp();

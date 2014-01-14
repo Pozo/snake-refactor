@@ -1,10 +1,12 @@
-package com.epam.game.snake.ui;
+package com.epam.game.snake.ui.toplist;
 
 import java.awt.Color;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import com.epam.game.snake.ui.GameBoard;
 
 public class TopPanel extends JPanel {
     public TopPanel() {

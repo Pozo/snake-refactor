@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import com.epam.game.Game;
+import com.epam.game.snake.ui.util.KeyValidator;
 
 public class GameKeyListener implements KeyListener {
     private final Game game;
@@ -14,45 +15,43 @@ public class GameKeyListener implements KeyListener {
     
     @Override
     public void keyPressed(KeyEvent e) {
-        if(game.getEntity().canMoveLeft() && isLeftPressed(e)) {
-            game.getEntityController().moveLeft();
-        }
-        if(game.getEntity().canMoveRight() && isRightPressed(e)) {
-            
-            game.getEntityController().moveRight();
-        }
-        if(game.getEntity().canMoveUp() && isUpPressed(e)) {
-            
-            game.getEntityController().moveUp();
-        }
-        if(game.getEntity().canMoveDown() && isDownPressed(e)) {
-            
-            game.getEntityController().moveDown();
-        }
-        if (isF2Pressed(e)) {
+        handleLeft(e);
+        handleRight(e);
+        handleUp(e);
+        handleDown(e);
+        handleF2(e);
+    }
+
+    private void handleF2(KeyEvent e) {
+        if (KeyValidator.isF2Pressed(e)) {
             game.reset();
         }
     }
 
-    private boolean isF2Pressed(KeyEvent e) {
-        return e.getKeyCode() == KeyEvent.VK_F2;
+    private void handleDown(KeyEvent e) {
+        if(game.getEntityDirectionController().canMoveDown() && KeyValidator.isDownPressed(e)) {
+            game.getEntityController().moveDown();
+        }
     }
 
-    private boolean isDownPressed(KeyEvent e) {
-        return e.getKeyCode() == KeyEvent.VK_DOWN;
+    private void handleUp(KeyEvent e) {
+        if(game.getEntityDirectionController().canMoveUp() && KeyValidator.isUpPressed(e)) {
+            game.getEntityController().moveUp();
+        }
     }
 
-    private boolean isRightPressed(KeyEvent e) {
-        return e.getKeyCode() == KeyEvent.VK_RIGHT;
+    private void handleRight(KeyEvent e) {
+        if(game.getEntityDirectionController().canMoveRight() && KeyValidator.isRightPressed(e)) {
+            game.getEntityController().moveRight();
+        }
     }
 
-    private boolean isUpPressed(KeyEvent e) {
-        return e.getKeyCode() == KeyEvent.VK_UP;
+    private void handleLeft(KeyEvent e) {
+        if(game.getEntityDirectionController().canMoveLeft() && KeyValidator.isLeftPressed(e)) {
+            game.getEntityController().moveLeft();
+        }
     }
 
-    private boolean isLeftPressed(KeyEvent e) {
-        return e.getKeyCode() == KeyEvent.VK_LEFT;
-    }
     @Override
     public void keyReleased(KeyEvent arg0) {
     }
