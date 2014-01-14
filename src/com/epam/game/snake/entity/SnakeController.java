@@ -1,7 +1,8 @@
-package com.epam.game.snake;
+package com.epam.game.snake.entity;
 
 import com.epam.game.entity.EntityController;
 import com.epam.game.entity.EntityDirection;
+import com.epam.game.snake.SnakeGame;
 
 public class SnakeController implements EntityController {
 

@@ -5,6 +5,7 @@ import com.epam.game.GameController;
 import com.epam.game.GameScoreController;
 import com.epam.game.GameSpeedController;
 import com.epam.game.entity.EntityDirectionController;
+import com.epam.game.snake.entity.SnakeEntityDirectionController;
 
 public class SnakeGameController implements GameController {
     private final GameScoreController gameScoreController = new SnakeGameScoreController();

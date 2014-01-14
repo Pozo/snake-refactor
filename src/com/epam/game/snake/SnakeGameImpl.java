@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import com.epam.game.GameController;
 import com.epam.game.entity.EntityController;
 import com.epam.game.entity.EntityDirectionObserver;
+import com.epam.game.snake.entity.SnakeController;
 import com.epam.game.snake.toplist.Player;
 import com.epam.game.snake.ui.GameBoard;
 import com.epam.game.snake.ui.GameKeyListener;

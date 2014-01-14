@@ -1,4 +1,4 @@
-package com.epam.game.snake;
+package com.epam.game.snake.entity;
 
 import java.awt.Point;
 
